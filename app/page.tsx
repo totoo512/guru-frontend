@@ -4,6 +4,7 @@ import { useEffect, useState, type MouseEvent } from "react";
 import { flushSync } from "react-dom";
 import { Button, Collapse, ConfigProvider, Popover, Segmented, Space, theme as antdTheme } from "antd";
 import { AndroidFilled, AppleFilled, CheckOutlined, MoonOutlined, PlayCircleFilled, SunOutlined } from "@ant-design/icons";
+import AnimatedModal from "../components/AnimatedModal";
 
 const A = "/assets/";
 
@@ -103,11 +104,9 @@ export default function Home() {
   const [cap, setCap] = useState(0);
   const [faq, setFaq] = useState(0);
   const [modal, setModal] = useState<"download" | "award" | "scene" | null>(null);
-  const [modalRendered, setModalRendered] = useState<typeof modal>(null);
-  const [modalVisible, setModalVisible] = useState(false);
   const [award, setAward] = useState(0);
   const [scene, setScene] = useState(0);
-  const [palette, setPalette] = useState<PaletteKey>("guru");
+  const [palette, setPalette] = useState<PaletteKey>("aurora");
   const [mode, setMode] = useState<Mode>("light");
   const current = palettes.find((p) => p.key === palette) ?? palettes[0];
 
@@ -169,21 +168,7 @@ export default function Home() {
   );
 
   useEffect(() => {
-    if (modal) {
-      setModalRendered(modal);
-      setModalVisible(false);
-      const t = window.setTimeout(() => setModalVisible(true), 30);
-      return () => window.clearTimeout(t);
-    }
-
-    setModalVisible(false);
-    const t = window.setTimeout(() => setModalRendered(null), 260);
-    return () => window.clearTimeout(t);
-  }, [modal]);
-
-  useEffect(() => {
-    const locked = !!modalRendered || menuOpen;
-    if (!locked) return;
+    if (!menuOpen) return;
     const root = document.documentElement;
     const body = document.body;
     const scrollY = window.scrollY;
@@ -212,7 +197,7 @@ export default function Home() {
       window.scrollTo(0, scrollY);
       root.style.scrollBehavior = prevRootScrollBehavior;
     };
-  }, [modalRendered, menuOpen]);
+  }, [menuOpen]);
 
   return (
     <ConfigProvider theme={{ algorithm: mode === "dark" ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm, token: { colorPrimary: current.brand, borderRadius: 12, fontFamily: '"MiSans Normal","PingFang SC",-apple-system,system-ui,sans-serif' } }}>
@@ -227,13 +212,13 @@ export default function Home() {
             </ul>
             <div className="nav-actions nav-actions--panel"><button className="btn" onClick={() => setModal("download")}>免费下载APP</button></div>
           </nav>
-          <div className="nav-actions nav-actions--bar"><div className="theme-switch"><Popover content={themePanel} trigger="click" placement="bottomRight" arrow={false} rootClassName="theme-popover"><button type="button" className="theme-btn" aria-label="切换主题色"><span className="theme-dot" /></button></Popover><button type="button" className={`theme-btn mode-btn ${mode === "dark" ? "is-dark" : ""}`} aria-label={mode === "dark" ? "切换到白天模式" : "切换到夜间模式"} onClick={(e) => changeMode(mode === "dark" ? "light" : "dark", e)}><SunOutlined className="mode-sun" /><MoonOutlined className="mode-moon" /></button></div><a className="btn nav-biz" href="#biz-teaser">了解企业版</a><button className="btn btn-primary" onClick={() => setModal("download")}>下载 APP</button></div>
+          <div className="nav-actions nav-actions--bar"><div className="theme-switch"><Popover content={themePanel} trigger="click" placement="bottomRight" arrow={false} rootClassName="theme-popover"><button type="button" className="theme-btn" aria-label="切换主题色"><span className="theme-dot" /></button></Popover><button type="button" className={`theme-btn mode-btn ${mode === "dark" ? "is-dark" : ""}`} aria-label={mode === "dark" ? "切换到白天模式" : "切换到夜间模式"} onClick={(e) => changeMode(mode === "dark" ? "light" : "dark", e)}><SunOutlined className="mode-sun" /><MoonOutlined className="mode-moon" /></button></div><a className="btn nav-biz" href="/business">了解企业版</a><button className="btn btn-primary" onClick={() => setModal("download")}>下载 APP</button></div>
           <button className="nav-toggle" aria-label="打开菜单" onClick={() => setMenuOpen(!menuOpen)}><span className="nav-burger"><i/><i/><i/></span></button>
         </div>
       </header>
 
       <section className="hero" id="top"><div className="wrap grid grid-2 hero-grid">
-        <div className="hero-copy"><span className="tag hero-tag">全新上线 · AI 对话 2.0</span><h1 className="hero-title">你的 <span className="hero-title-accent">场景化 AI</span><br/>英语口语教练</h1><p className="hero-sub">帮中国人真正开口说英语。个性化场景 · 实时纠音 · 口语能力雷达，<br className="hero-sub-break"/>每天 10 分钟，让你的英语像母语一样自然。</p><Space className="hero-actions" size={10} wrap><Button type="primary" size="large" icon={<AppleFilled/>} onClick={() => setModal("download")}>iOS 下载</Button><Button size="large" icon={<AndroidFilled/>} onClick={() => setModal("download")}>Android 下载</Button><Button className="hero-demo" size="large" type="text" icon={<PlayCircleFilled/>} href="#how">观看演示</Button></Space><div className="hero-stats">{heroStats.map((item)=><div className="hero-stat" key={item.label}><strong>{item.num}</strong><span>{item.label}</span></div>)}</div></div>
+        <div className="hero-copy"><span className="tag hero-tag">全新上线 · AI 对话英语口语练习</span><p className="hero-brand">咕噜口语</p><h1 className="hero-title">你的 <span className="hero-title-accent">场景化 AI</span> 英语口语教练</h1><p className="hero-sub">帮中国人真正开口说英语。个性化场景 · 实时纠音 · 口语能力雷达，<br className="hero-sub-break"/>每天 10 分钟，让你的英语像母语一样自然。</p><Space className="hero-actions" size={10} wrap><button className="btn btn-primary btn-lg hero-download-cta" onClick={()=>setModal("download")}>免费下载APP开始体验</button><Button className="hero-demo" size="large" type="text" icon={<PlayCircleFilled/>} href="#how">观看演示</Button></Space><div className="hero-stats">{heroStats.map((item)=><div className="hero-stat" key={item.label}><strong>{item.num}</strong><span>{item.label}</span></div>)}</div></div>
         <div className="hero-visual"><div className="guru-visual-card"><span className="guru-orbit guru-orbit--a"/><span className="guru-orbit guru-orbit--b"/><img className="guru-character" src={`${A}guru-angela.webp`} alt="咕噜口语 AI 外教 Angela"/><div className="guru-brand-chip"><img src={`${A}guru-icon.png`} alt=""/><span><b>SpeakGuru</b><small>你的 AI 口语搭子</small></span></div><span className="guru-bubble guru-bubble--a">实时自然对话</span><span className="guru-bubble guru-bubble--b">AI 发音纠正</span><span className="guru-bubble guru-bubble--c">随时随地开口</span></div></div>
       </div></section>
 
@@ -252,17 +237,21 @@ export default function Home() {
 
       <section className="section section--soft" id="scenes"><div className="wrap"><div className="section-head"><h2>核心场景全覆盖，即学即用</h2><p className="muted">咕噜口语依托海量大数据与真实职场语料库，精心研发数万节 AI 情景课程，全面覆盖生活、工作的实际语言需求。</p></div><div className="scene-gallery">{scenes.map((s,i)=><button className={`scene-card ${i===4?"scene-card--enterprise":""}`} key={s[1]} onClick={()=>{setScene(i);setModal("scene")}}><img src={`${A}${s[0]}`} alt={`${s[1]}场景`} /><span className="scene-card-hover"><b className="scene-card-cta">{i===4?"了解详情":"内容预览"}</b></span><span className="scene-card-cap"><strong>{s[1]}</strong><em>{s[2]}</em></span></button>)}</div></div></section>
 
-      <section className="section" id="biz-teaser"><div className="wrap"><div className="box grid grid-2 biz-box"><div><span className="tag tag-green">咕噜口语企业版</span><h2>给团队的口语训练管理系统</h2><p>把「练口语」变成可布置、可追踪、可汇报的组织能力。帮企业省心省力解决英语口语难题。</p><ul><li>组织与席位管理，离职可回收再分配</li><li>任务下发、打卡规则与完成率追踪</li><li>学习数据看板，效果清晰可汇报</li></ul><a className="btn btn-primary" href="#faq">了解企业版 →</a></div><a className="shot shot--wide" href="#faq"><img src={`${A}biz-hero.png`} alt="企业管理后台数据概览" /></a></div></div></section>
+      <section className="section" id="biz-teaser"><div className="wrap"><div className="box grid grid-2 biz-box"><div><span className="tag tag-green">咕噜口语企业版</span><h2>给团队的口语训练管理系统</h2><p>把「练口语」变成可布置、可追踪、可汇报的组织能力。帮企业省心省力解决英语口语难题。</p><ul><li>组织与席位管理，离职可回收再分配</li><li>任务下发、打卡规则与完成率追踪</li><li>学习数据看板，效果清晰可汇报</li></ul><a className="btn btn-primary" href="/business">了解企业版 →</a></div><a className="shot shot--wide" href="/business"><img src={`${A}biz-hero.png`} alt="企业管理后台数据概览" /></a></div></div></section>
 
       <section className="section section--soft reviews"><div className="wrap"><div className="section-head"><h2>用户真实评价</h2><p className="muted">来自上千万用户的 App Store 真实反馈。</p></div></div><div className="review-walls">{[reviews,reviews.slice().reverse()].map((row,j)=><div className={`review-wall review-wall--${j?"b":"a"}`} key={j}><div className="review-wall-track">{[...row,...row].map((r,i)=><article className="review-card" key={`${j}-${i}`}><strong>{r[0]}</strong><span className="review-stars">★★★★★</span><span className="review-meta">{r[1]}</span><p>{r[2]}</p></article>)}</div></div>)}</div></section>
 
-      <section className="section" id="faq"><div className="wrap grid grid-2 faq-layout"><div><h2>常见问题</h2><Collapse className="faq-collapse" accordion activeKey={faq < 0 ? [] : [String(faq)]} onChange={(key)=>setFaq(key.length ? Number(key[0]) : -1)} expandIconPosition="end" expandIcon={({isActive})=><span className={`acc-icon ${isActive?"is-active":""}`} aria-hidden="true"/>} items={faqs.map((f,i)=>({key:String(i),label:f[0],children:<p>{f[1]}</p>}))}/></div><aside className="box faq-side"><p className="hero-brand faq-side-brand">咕噜口语</p><h3>现在开始，今天就能开口</h3><p className="muted">免费体验场景化 AI 英语口语练习。</p><button className="btn btn-primary" onClick={()=>setModal("download")}>免费下载 APP</button><div className="divider"/><p className="small">教育机构、学校或企业团队？</p><a className="btn btn-sm" href="#biz-teaser">咨询企业版</a></aside></div></section>
+      <section className="section" id="faq"><div className="wrap grid grid-2 faq-layout"><div><h2>常见问题</h2><Collapse className="faq-collapse" accordion activeKey={faq < 0 ? [] : [String(faq)]} onChange={(key)=>setFaq(key.length ? Number(key[0]) : -1)} expandIconPosition="end" expandIcon={({isActive})=><span className={`acc-icon ${isActive?"is-active":""}`} aria-hidden="true"/>} items={faqs.map((f,i)=>({key:String(i),label:f[0],children:<p>{f[1]}</p>}))}/></div><aside className="box faq-side"><p className="hero-brand faq-side-brand">咕噜口语</p><h3>现在开始，今天就能开口</h3><p className="muted">免费体验场景化 AI 英语口语练习。</p><button className="btn btn-primary" onClick={()=>setModal("download")}>免费下载 APP</button><div className="divider"/><p className="small">教育机构、学校或企业团队？</p><a className="btn btn-sm" href="/business">咨询企业版</a></aside></div></section>
 
-      <section className="section center" id="final-cta"><div className="wrap"><h2>自信开口，即刻开始</h2><p className="muted">仅需5分钟，在咕噜口语完成你的第一段AI英语对话。</p><div className="cta-row"><button className="btn btn-primary btn-lg" onClick={()=>setModal("download")}>免费下载APP</button><a className="btn btn-lg" href="#biz-teaser">了解企业版</a></div></div></section>
+      <section className="section center" id="final-cta"><div className="wrap"><h2>自信开口，即刻开始</h2><p className="muted">仅需5分钟，在咕噜口语完成你的第一段AI英语对话。</p><div className="cta-row"><button className="btn btn-primary btn-lg" onClick={()=>setModal("download")}>免费下载APP</button><a className="btn btn-lg" href="/business">了解企业版</a></div></div></section>
 
-      <footer className="site-footer"><div className="wrap"><div className="foot-grid"><div className="foot-brand"><h4>咕噜口语</h4><p className="small">你的场景化 AI 英语口语教练<br/>帮中国人真正开口说英语</p></div><div><h4>产品</h4><div className="stack"><a href="#how">如何开口</a><a href="#capabilities">核心功能</a><a href="#scenes">练习场景</a></div></div><div><h4>服务</h4><div className="stack"><a href="#biz-teaser">企业版</a><a href="#faq">常见问题</a></div></div><div><h4>法律</h4><div className="stack"><a href="#">用户协议</a><a href="#">隐私政策</a></div></div></div><div className="foot-meta"><div>© 2026 北京火山创想科技有限公司</div><div className="foot-meta-beian">京ICP备2023000000号 <span>·</span><img src={`${A}beian.png`} alt=""/> 京公网安备 11000000000000号</div></div></div></footer>
+      <footer className="site-footer"><div className="wrap"><div className="foot-grid"><div className="foot-brand"><h4>咕噜口语</h4><p className="small">你的场景化 AI 英语口语教练<br/>帮中国人真正开口说英语</p></div><div><h4>产品</h4><div className="stack"><a href="#how">如何开口</a><a href="#capabilities">核心功能</a><a href="#scenes">练习场景</a></div></div><div><h4>服务</h4><div className="stack"><a href="/business">企业版</a><a href="#faq">常见问题</a></div></div><div><h4>法律</h4><div className="stack"><a href="#">用户协议</a><a href="#">隐私政策</a></div></div></div><div className="foot-meta"><div>© 2026 北京火山创想科技有限公司</div><div className="foot-meta-beian">京ICP备2023000000号 <span>·</span><img src={`${A}beian.png`} alt=""/> 京公网安备 11000000000000号</div></div></div></footer>
 
-      {modalRendered&&<div className={`modal-backdrop ${modalVisible?"is-open":""}`} onMouseDown={()=>setModal(null)}><div className="modal" onMouseDown={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>setModal(null)}>×</button>{modalRendered==="download"&&<><div className="modal-title"><h3>下载咕噜口语</h3><p>扫码下载 APP，立即开始体验</p></div><div className="download-grid"><div><img src={`${A}ios.png`} alt="iOS 下载二维码"/><b>iOS 下载</b></div><div><img src={`${A}android.png`} alt="Android 下载二维码"/><b>Android 下载</b></div></div></>}{modalRendered==="award"&&<><div className="modal-title"><h3>{award===0?"2025 年度卓越成就语言培训品牌":"2024 年度 AI 影响力教育品牌"}</h3></div><div className="award-full"><img src={`${A}${award===0?"award-hurun.png":"award-tencent.png"}`} alt="获奖证书"/></div></>}{modalRendered==="scene"&&<><div className="modal-title"><span className="tag tag-green">场景预览</span><h3>{scenes[scene][1]}</h3><p>{scenes[scene][2]}</p></div><img className="scene-preview" src={`${A}${scenes[scene][0]}`} alt={scenes[scene][1]}/></>}</div></div>}
+      <AnimatedModal open={modal !== null} onClose={() => setModal(null)} className={modal === "download" ? "modal--download" : ""}>
+        {modal === "download" && <div className="download-modal"><div className="modal-title"><h3>下载 APP</h3><p>支持 iOS / Android，扫码或选择应用商店下载。</p></div><div className="download-grid"><article className="download-platform"><div className="download-platform-head"><span><AppleFilled/></span><div><b>iOS</b><small>App Store</small></div></div><img className="download-qr" src={`${A}ios.png`} alt="iOS 下载二维码"/><Button className="download-store-link download-store-link--android" size="large" icon={<AppleFilled/>} href="https://apps.apple.com/cn/app/%E5%92%95%E5%99%9C%E5%8F%A3%E8%AF%AD-ai%E5%A4%96%E6%95%991%E5%AF%B91%E7%BB%83%E5%8F%A3%E8%AF%AD/id6462875096" target="_blank" rel="noopener noreferrer">App Store 下载</Button></article><article className="download-platform"><div className="download-platform-head"><span><AndroidFilled/></span><div><b>Android</b><small>应用宝</small></div></div><img className="download-qr" src={`${A}android.png`} alt="Android 下载二维码"/><Button className="download-store-link download-store-link--android" size="large" icon={<AndroidFilled/>} href="https://sj.qq.com/appdetail/com.huoideas.speakguru" target="_blank" rel="noopener noreferrer">Android 下载</Button></article></div><p className="download-tip">使用手机扫码，或点击对应按钮前往应用商店</p></div>}
+        {modal === "award" && <><div className="modal-title"><h3>{award===0?"2025 年度卓越成就语言培训品牌":"2024 年度 AI 影响力教育品牌"}</h3></div><div className="award-full"><img src={`${A}${award===0?"award-hurun.png":"award-tencent.png"}`} alt="获奖证书"/></div></>}
+        {modal === "scene" && <><div className="modal-title"><span className="tag tag-green">场景预览</span><h3>{scenes[scene][1]}</h3><p>{scenes[scene][2]}</p></div><img className="scene-preview" src={`${A}${scenes[scene][0]}`} alt={scenes[scene][1]}/></>}
+      </AnimatedModal>
     </main>
     </ConfigProvider>
   );
