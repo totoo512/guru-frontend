@@ -19,9 +19,8 @@ import {
 } from "@ant-design/icons";
 import { Collapse, ConfigProvider, Drawer, Popover, Segmented, theme as antdTheme } from "antd";
 import AnimatedModal from "../../components/AnimatedModal";
+import { ASSETS as A } from "../../lib/paths";
 import styles from "./business.module.css";
-
-const A = "/assets/";
 
 const palettes = [
   ["guru", "云朵蓝粉", "linear-gradient(135deg,#8fc6ff,#b8b5ff 50%,#ffacd8)", "#89a9f8"],
@@ -187,10 +186,10 @@ export default function BusinessPage() {
       <main className={styles.page}>
         <header className="site-header">
           <div className="wrap nav-inner">
-            <a className="logo" href="/">
+            <Link className="logo" href="/">
               <img src={`${A}guru-icon.png`} alt="咕噜口语" />
               <span>咕噜口语</span><small className={styles.businessBadge}>企业版</small>
-            </a>
+            </Link>
             <nav className={styles.desktopNav}>
               <a href="#top">首页</a>
               <a href="#platform">平台能力</a>
@@ -373,7 +372,7 @@ export default function BusinessPage() {
 
         <footer className={styles.footer}>
           <div className={styles.wrap}>
-            <div className={styles.footerTop}><a className={styles.logo} href="/"><img src={`${A}guru-icon.png`} alt="" /><span>咕噜口语<small>企业版</small></span></a><p>让每个团队，都能自信开口连接世界。</p><div><a href="#platform">平台能力</a><a href="#outcomes">学习效果</a><a href="#faq">常见问题</a><a href="/">个人版</a></div></div>
+            <div className={styles.footerTop}><Link className={styles.logo} href="/"><img src={`${A}guru-icon.png`} alt="" /><span>咕噜口语<small>企业版</small></span></Link><p>让每个团队，都能自信开口连接世界。</p><div><a href="#platform">平台能力</a><a href="#outcomes">学习效果</a><a href="#faq">常见问题</a><Link href="/">个人版</Link></div></div>
             <div className={styles.footerMeta}><span>© 2026 北京火山创想科技有限公司</span><span>京ICP备2023000000号</span></div>
           </div>
         </footer>
