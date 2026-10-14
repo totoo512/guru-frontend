@@ -91,14 +91,14 @@ const outcomes = [
   {
     title: "打卡完成率",
     description: "任务下达后的完成进度实时更新，及时跟进异常情况。",
-    image: "business-outcome-2.jpg",
+    image: "business-outcome-2.png",
     icon: CheckCircleFilled,
     stat: "执行过程",
   },
   {
     title: "能力变化趋势",
     description: "发音、流利度、词汇与表达画像随练习动态更新。",
-    image: "business-outcome-3.jpg",
+    image: "business-outcome-3.png",
     icon: LineChartOutlined,
     stat: "学习效果",
   },
@@ -244,7 +244,6 @@ export default function BusinessPage() {
             </div>
             <div className={styles.heroVisual}>
               <div className={styles.dashboardFrame}>
-                <div className={styles.browserBar}><i /><i /><i /><span>团队学习数据中心</span></div>
                 <img src={`${A}business-hero.png`} alt="咕噜口语企业学习数据看板" />
               </div>
               <div className={`${styles.floatingMetric} ${styles.metricA}`}><DashboardOutlined /><span><b>92%</b>本月任务完成率</span></div>
@@ -373,7 +372,7 @@ export default function BusinessPage() {
         <footer className={styles.footer}>
           <div className={styles.wrap}>
             <div className={styles.footerTop}><Link className={styles.logo} href="/"><img src={`${A}guru-icon.png`} alt="" /><span>咕噜口语<small>企业版</small></span></Link><p>让每个团队，都能自信开口连接世界。</p><div><a href="#platform">平台能力</a><a href="#outcomes">学习效果</a><a href="#faq">常见问题</a><Link href="/">个人版</Link></div></div>
-            <div className={styles.footerMeta}><span>© 2026 北京火山创想科技有限公司</span><span>京ICP备2023000000号</span></div>
+            <div className={styles.footerMeta}><span>© 2026 北京火山创想科技有限公司</span><span>京ICP备2023009050号-4</span></div>
           </div>
         </footer>
 
