@@ -1,5 +1,7 @@
 "use client";
 
+import SiteFooter from "@/components/SiteFooter";
+
 import Link from "next/link";
 import { useEffect, useState, type MouseEvent } from "react";
 import { flushSync } from "react-dom";
@@ -195,6 +197,7 @@ export default function BusinessPage() {
               <a href="#platform">平台能力</a>
               <a href="#outcomes">学习效果</a>
               <a href="#service">服务流程</a>
+              <Link href="/news">资讯</Link>
               <a href="#faq">FAQ</a>
             </nav>
             <div className="nav-actions nav-actions--bar">
@@ -217,6 +220,7 @@ export default function BusinessPage() {
             <a href="#platform" onClick={closeMenu}>平台能力</a>
             <a href="#outcomes" onClick={closeMenu}>学习效果</a>
             <a href="#service" onClick={closeMenu}>服务流程</a>
+            <Link href="/news" onClick={closeMenu}>资讯</Link>
             <a href="#faq" onClick={closeMenu}>FAQ</a>
             <Link href="/">返回个人版</Link>
             <button onClick={() => { closeMenu(); setContact("trial"); }}>免费开通试用</button>
@@ -228,7 +232,6 @@ export default function BusinessPage() {
           <div className={styles.heroGlowB} />
           <div className={styles.wrap}>
             <div className={styles.heroCopy}>
-              <span className={styles.eyebrow}><SafetyCertificateOutlined /> 企业口语训练解决方案</span>
               <h1><span>咕噜口语</span>企业版</h1>
               <h2>让口语训练<br />可布置、可量化、可汇报</h2>
               <p>把真实业务场景、AI 口语练习与组织数据管理连接起来，让每一次开口都转化为团队能力。</p>
@@ -317,14 +320,13 @@ export default function BusinessPage() {
         <section className={styles.outcomes} id="outcomes">
           <div className={styles.wrap}>
             <div className={styles.sectionHead}>
-              <span>效果可视</span>
               <h2>每一分投入，都能形成清晰报告</h2>
               <p>不只统计登录次数，更关注有效练习、任务执行和真实能力变化。</p>
             </div>
             <div className={styles.outcomeLayout}>
               <div className={styles.outcomeTabs}>{outcomes.map((item, index) => {
                 const Icon = item.icon;
-                return <button className={outcome === index ? styles.outcomeActive : ""} key={item.title} onClick={() => setOutcome(index)}><Icon /><span><small>{item.stat}</small><b>{item.title}</b><em>{item.description}</em></span></button>;
+                return <button className={outcome === index ? styles.outcomeActive : ""} key={item.title} onClick={() => setOutcome(index)}><Icon /><span><b>{item.title}</b><em>{item.description}</em></span></button>;
               })}</div>
               <div className={styles.outcomeVisual} key={outcome}><img src={`${A}${outcomes[outcome].image}`} alt={outcomes[outcome].title} /></div>
             </div>
@@ -334,7 +336,6 @@ export default function BusinessPage() {
         <section className={styles.service} id="service">
           <div className={styles.wrap}>
             <div className={styles.sectionHead}>
-              <span>陪伴式落地</span>
               <h2>从试用到复盘，企业顾问全程协助</h2>
               <p>以真实业务目标为起点，不做“一发账号就结束”的培训项目。</p>
             </div>
@@ -352,7 +353,7 @@ export default function BusinessPage() {
         <section className={styles.faq} id="faq">
           <div className={styles.wrap}>
             <div className={styles.faqLayout}>
-              <div className={styles.faqLead}><span>常见问题</span><h2>采购前，你可能还想了解</h2><p>如果没有找到答案，企业顾问会根据你的团队情况提供一对一说明。</p><button className={styles.secondaryButton} onClick={() => setContact("consult")}>联系企业顾问</button></div>
+              <div className={styles.faqLead}><h2>采购前，你可能还想了解</h2><p>如果没有找到答案，企业顾问会根据你的团队情况提供一对一说明。</p><button className={styles.secondaryButton} onClick={() => setContact("consult")}>联系企业顾问</button></div>
               <Collapse className={styles.faqCollapse} accordion expandIconPosition="end" expandIcon={({ isActive }) => <span className={`${styles.faqIcon} ${isActive ? styles.faqIconActive : ""}`} aria-hidden="true" />} items={faqs.map(([label, answer], index) => ({ key: String(index), label, children: <p>{answer}</p> }))} />
             </div>
           </div>
@@ -369,12 +370,7 @@ export default function BusinessPage() {
           </div>
         </section>
 
-        <footer className={styles.footer}>
-          <div className={styles.wrap}>
-            <div className={styles.footerTop}><Link className={styles.logo} href="/"><img src={`${A}guru-icon.png`} alt="" /><span>咕噜口语<small>企业版</small></span></Link><p>让每个团队，都能自信开口连接世界。</p><div><a href="#platform">平台能力</a><a href="#outcomes">学习效果</a><a href="#faq">常见问题</a><Link href="/">个人版</Link></div></div>
-            <div className={styles.footerMeta}><span>© 2026 北京火山创想科技有限公司</span><span>京ICP备2023009050号-4</span></div>
-          </div>
-        </footer>
+        <SiteFooter />
 
         <AnimatedModal open={contact !== null} onClose={() => setContact(null)} className={styles.contactModal}>
           {contact && <div className={styles.modalBody}>

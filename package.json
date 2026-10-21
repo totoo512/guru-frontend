@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "build": "next build && node scripts/prepare-dist.mjs",
+    "start": "node dist/server.js",
+    "lint": "next lint",
+    "test:articles": "node --test tests/article-html.test.cjs",
+    "test:article-api": "node --test checks/articles-api.test.cjs"
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
@@ -15,12 +17,14 @@
     "framer-motion": "^11.11.1",
     "next": "14.2.15",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "sanitize-html": "^2.18.1"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/sanitize-html": "^2.16.2",
     "typescript": "^5"
   }
 }

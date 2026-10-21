@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ASSETS } from "../lib/paths";
+import { SITE_URL } from "../lib/site";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "咕噜口语 - 场景化 AI 英语口语练习",
   description: "咕噜口语，你的场景化 AI 英语口语教练。",
   icons: { icon: `${ASSETS}guru-icon.png` },

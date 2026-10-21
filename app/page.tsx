@@ -1,22 +1,14 @@
 "use client";
 
-import { useEffect, useState, type MouseEvent } from "react";
-import { flushSync } from "react-dom";
-import { Button, Collapse, ConfigProvider, Popover, Segmented, Space, theme as antdTheme } from "antd";
-import { AndroidFilled, AppleFilled, CheckOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
+import SiteFooter from "@/components/SiteFooter";
+
+import { useEffect, useState } from "react";
+import { Collapse, ConfigProvider, Space, theme as antdTheme } from "antd";
+import SiteHeader from "@/components/SiteHeader";
+import AppDownloadContent from "@/components/AppDownloadContent";
+import { useSiteTheme } from "@/lib/useSiteTheme";
 import AnimatedModal from "../components/AnimatedModal";
 import { ASSETS as A, BASE } from "../lib/paths";
-
-const palettes = [
-  { key: "guru", name: "云朵蓝粉", brand: "#89a9f8", grad: "linear-gradient(135deg,#8fc6ff,#b8b5ff 50%,#ffacd8)" },
-  { key: "mint", name: "薄荷青紫", brand: "#73cbbd", grad: "linear-gradient(135deg,#88ded0,#a9d5ec 52%,#c8b5f7)" },
-  { key: "violet", name: "雾霭丁香", brand: "#a296eb", grad: "linear-gradient(135deg,#b9acf8,#d1baf2 50%,#edbadf)" },
-  { key: "sunset", name: "蜜桃奶杏", brand: "#eeae82", grad: "linear-gradient(135deg,#ffd19f,#ffb9b8 52%,#f7a9c9)" },
-  { key: "aurora", name: "极光蓝粉", brand: "#5b7cff", grad: "linear-gradient(135deg,#5b7cff,#9b7bfb 50%,#ec4fd6)" },
-  { key: "jade", name: "翡翠薄荷", brand: "#0ebd8d", grad: "linear-gradient(135deg,#0a9a74,#0ebd8d 50%,#3dd4c4)" },
-  { key: "nebula", name: "星云紫", brand: "#7c5cff", grad: "linear-gradient(135deg,#7c5cff,#a66bff 50%,#ff6fb5)" },
-  { key: "ember", name: "活力橙", brand: "#ff7a45", grad: "linear-gradient(135deg,#ff5e62,#ff7a45 50%,#ffb020)" },
-] as const;
 
 const awards = [
   { media: "award-certs.jpg", photo: true, issuer: "OPENAIGC 开发者大赛", title: "拯救姬 AI 创意赛第一名", desc: "第二届拯救者杯 OPENAIGC 开发者大赛，荣获拯救姬 AI 创意赛第一名", full: "award-certs.jpg" },
@@ -32,10 +24,6 @@ const heroStats = [
   { num: "4.9★", label: "App Store 评分" },
   { num: "1000W+", label: "累计学习用户" },
 ];
-
-type PaletteKey = (typeof palettes)[number]["key"];
-type Mode = "light" | "dark";
-type ViewTransitionDoc = Document & { startViewTransition?: (cb: () => void) => { ready: Promise<void> } };
 
 const steps = [
   {
@@ -142,7 +130,6 @@ const faqs = [
 ];
 
 export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [cap, setCap] = useState(0);
   const [faq, setFaq] = useState(0);
@@ -163,129 +150,27 @@ export default function Home() {
   }, [modal, scene, intent]);
   const sceneCat = sceneCategories[sceneKeys[scene]];
   const sceneIt = sceneCat.intents[intent];
-  const [palette, setPalette] = useState<PaletteKey>("aurora");
-  const [mode, setMode] = useState<Mode>("light");
-  const current = palettes.find((p) => p.key === palette) ?? palettes[0];
+  const siteTheme = useSiteTheme();
+  const { mode, current } = siteTheme;
 
-  useEffect(() => {
-    const d = document.documentElement.dataset;
-    if (palettes.some((p) => p.key === d.theme)) setPalette(d.theme as PaletteKey);
-    setMode(d.mode === "dark" ? "dark" : "light");
-  }, []);
-
-  const changePalette = (key: PaletteKey) => {
-    setPalette(key);
-    document.documentElement.dataset.theme = key;
-    localStorage.setItem("guru-theme", key);
-  };
-
-  const changeMode = (next: Mode, e?: MouseEvent) => {
-    if (next === mode) return;
-    const root = document.documentElement;
-    const apply = () => {
-      flushSync(() => setMode(next));
-      root.dataset.mode = next;
-      localStorage.setItem("guru-mode", next);
-    };
-    const doc = document as ViewTransitionDoc;
-    if (!doc.startViewTransition || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return apply();
-    const x = e?.clientX ?? window.innerWidth - 40;
-    const y = e?.clientY ?? 34;
-    const r = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
-    doc.startViewTransition(apply).ready.then(() => {
-      root.animate(
-        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
-        { duration: 520, easing: "cubic-bezier(.4,0,.2,1)", pseudoElement: "::view-transition-new(root)" },
-      );
-    });
-  };
-
-  const themePanel = (
-    <div className="theme-pop">
-      <p className="theme-pop-title">主题色</p>
-      <div className="theme-swatches">
-        {palettes.map((p) => (
-          <button key={p.key} type="button" className={`theme-swatch ${palette === p.key ? "is-active" : ""}`} onClick={() => changePalette(p.key)}>
-            <i style={{ background: p.grad }}>{palette === p.key && <CheckOutlined />}</i>
-            <span>{p.name}</span>
-          </button>
-        ))}
-      </div>
-      <p className="theme-pop-title">显示模式</p>
-      <Segmented<Mode>
-        block
-        value={mode}
-        onChange={(v) => changeMode(v)}
-        options={[
-          { value: "light", label: <span className="theme-seg"><SunOutlined />白天</span> },
-          { value: "dark", label: <span className="theme-seg"><MoonOutlined />夜间</span> },
-        ]}
-      />
-    </div>
-  );
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const root = document.documentElement;
-    const body = document.body;
-    const scrollY = window.scrollY;
-    const prevRootOverflow = root.style.overflow;
-    const prevRootScrollBehavior = root.style.scrollBehavior;
-    const prevBodyOverflow = body.style.overflow;
-    const prevBodyPosition = body.style.position;
-    const prevBodyTop = body.style.top;
-    const prevBodyWidth = body.style.width;
-    const prevBodyPadding = body.style.paddingRight;
-    const scrollbarWidth = window.innerWidth - root.clientWidth;
-    root.style.overflow = "hidden";
-    body.style.overflow = "hidden";
-    body.style.position = "fixed";
-    body.style.top = `-${scrollY}px`;
-    body.style.width = "100%";
-    if (scrollbarWidth > 0) body.style.paddingRight = `${scrollbarWidth}px`;
-    return () => {
-      root.style.overflow = prevRootOverflow;
-      root.style.scrollBehavior = "auto";
-      body.style.overflow = prevBodyOverflow;
-      body.style.position = prevBodyPosition;
-      body.style.top = prevBodyTop;
-      body.style.width = prevBodyWidth;
-      body.style.paddingRight = prevBodyPadding;
-      window.scrollTo(0, scrollY);
-      root.style.scrollBehavior = prevRootScrollBehavior;
-    };
-  }, [menuOpen]);
 
   return (
     <ConfigProvider theme={{ algorithm: mode === "dark" ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm, token: { colorPrimary: current.brand, borderRadius: 12, fontFamily: '"MiSans Normal","PingFang SC",-apple-system,system-ui,sans-serif' } }}>
     <main className="keraft">
-      <header className={`site-header ${menuOpen ? "is-menu-open" : ""}`}>
-        <div className="wrap nav-inner">
-          <a className="logo" href="#top"><img src={`${A}guru-icon.png`} alt="咕噜口语" /><span>咕噜口语</span></a>
-          <nav className={`nav-panel ${menuOpen ? "is-open" : ""}`}>
-            <ul className="nav-links">
-              <li className="dropdown"><a href="#top" className="nav-link-dd">产品 <i className="nav-chevron" /></a><div className="dropdown-menu"><a href="#how" className="dd-item"><span className="dd-ico">✦</span><span className="dd-text"><b>核心产品</b><small>场景学习 · AI 对话</small></span></a></div></li>
-              <li><a href="#how">如何开口</a></li><li><a href="#capabilities">核心功能</a></li><li><a href="#scenes">场景</a></li><li><a href="#faq">FAQ</a></li>
-            </ul>
-            <div className="nav-actions nav-actions--panel"><button className="btn" onClick={() => setModal("download")}>免费下载APP</button></div>
-          </nav>
-          <div className="nav-actions nav-actions--bar"><div className="theme-switch"><Popover content={themePanel} trigger="click" placement="bottomRight" arrow={false} rootClassName="theme-popover"><button type="button" className="theme-btn" aria-label="切换主题色"><span className="theme-dot" /></button></Popover><button type="button" className={`theme-btn mode-btn ${mode === "dark" ? "is-dark" : ""}`} aria-label={mode === "dark" ? "切换到白天模式" : "切换到夜间模式"} onClick={(e) => changeMode(mode === "dark" ? "light" : "dark", e)}><SunOutlined className="mode-sun" /><MoonOutlined className="mode-moon" /></button></div><a className="btn nav-biz" href={`${BASE}/business`}>了解企业版</a><button className="btn btn-primary" onClick={() => setModal("download")}>下载 APP</button></div>
-          <button className="nav-toggle" aria-label="打开菜单" onClick={() => setMenuOpen(!menuOpen)}><span className="nav-burger"><i/><i/><i/></span></button>
-        </div>
-      </header>
+      <SiteHeader home theme={siteTheme} onDownload={() => setModal("download")} />
 
       <section className="hero" id="top"><div className="wrap grid grid-2 hero-grid">
-        <div className="hero-copy"><span className="tag hero-tag">全新上线 · AI 对话英语口语练习</span><p className="hero-brand">咕噜口语</p><h1 className="hero-title">你的 <span className="hero-title-accent">场景化 AI</span> 英语口语教练</h1><p className="hero-sub">帮中国人真正开口说英语。个性化场景 · 实时纠音 · 口语能力雷达，每天 10 分钟，让你的英语像母语一样自然。</p><Space className="hero-actions" size={10} wrap><button className="btn btn-primary btn-lg hero-download-cta" onClick={()=>setModal("download")}>免费下载APP开始体验</button></Space><div className="hero-stats">{heroStats.map((item)=><div className="hero-stat" key={item.label}><strong>{item.num}</strong><span>{item.label}</span></div>)}</div></div>
+        <div className="hero-copy"><p className="hero-brand">咕噜口语</p><h1 className="hero-title">你的 <span className="hero-title-accent">场景化 AI</span> 英语口语教练</h1><p className="hero-sub">帮中国人真正开口说英语。个性化场景 · 实时纠音 · 口语能力雷达，每天 10 分钟，让你的英语像母语一样自然。</p><Space className="hero-actions" size={10} wrap><button className="btn btn-primary btn-lg hero-download-cta" onClick={()=>setModal("download")}>免费下载APP开始体验</button></Space><div className="hero-stats">{heroStats.map((item)=><div className="hero-stat" key={item.label}><strong>{item.num}</strong><span>{item.label}</span></div>)}</div></div>
         <div className="hero-visual"><div className="hero-cover-wrap"><img className="hero-cover" src={`${A}cover.png`} alt="咕噜口语 APP 产品展示"/><span className="guru-bubble guru-bubble--a">实时自然对话</span><span className="guru-bubble guru-bubble--b">AI 发音纠正</span><span className="guru-bubble guru-bubble--c">随时随地开口</span></div></div>
       </div></section>
 
       <section className="section" id="honors"><span className="honors-blob honors-blob--brand"/><span className="honors-blob honors-blob--warm"/><div className="wrap">
-        <div className="honors-lead"><div className="honors-heading"><span className="tag tag-honors">权威认可</span><h2 style={{marginBottom: 0}}>荣获行业权威机构颁奖</h2></div><p className="muted">咕噜口语通过提供优质的产品和服务，收获了大量用户的广泛好评，亦得到了行业权威机构的高度认可</p></div>
-        <div className="awards-row">{awards.map((x,i)=><button className="award-card" key={x.title} onClick={()=>{setAward(i);setModal("award")}}><span className="award-ribbon">权威认证</span><span className={`award-media ${x.photo?"award-media--photo":""}`}><img src={`${A}${x.media}`} alt={x.title} /></span><span className="award-meta"><span className="award-issuer"><i className="award-issuer-dot"/>{x.issuer}</span><strong>{x.title}</strong><span className="award-title">{x.desc}</span><span className="award-cta">查看完整证书 →</span></span></button>)}</div>
+        <div className="honors-lead"><div className="honors-heading"><h2 style={{marginBottom: 0}}>荣获行业权威机构颁奖</h2></div><p className="muted">咕噜口语通过提供优质的产品和服务，收获了大量用户的广泛好评，亦得到了行业权威机构的高度认可</p></div>
+        <div className="awards-row">{awards.map((x,i)=><button className="award-card" key={x.title} onClick={()=>{setAward(i);setModal("award")}}><span className={`award-media ${x.photo?"award-media--photo":""}`}><img src={`${A}${x.media}`} alt={x.title} /></span><span className="award-meta"><span className="award-issuer"><i className="award-issuer-dot"/>{x.issuer}</span><strong>{x.title}</strong><span className="award-title">{x.desc}</span><span className="award-cta">查看完整证书 →</span></span></button>)}</div>
       </div></section>
 
       <section className="section" id="pain"><div className="wrap"><div className="section-head"><h2>为什么学了十多年，却还是哑巴英语？</h2><p className="muted">不是不够努力，而是练法不对：关键场合开不了口、通用课用不上、练了也不知道有没有进步。</p></div><div className="pain-grid">
-        {[["pain-meeting.png","痛点 01 · 场景失语","读写尚可，关键场合不敢说","邮件、文档还能应付；一到英文会议、客户对接、现场汇报，脑子里有词却组织不起来，怕说错、怕被追问，只好沉默或切回中文。"],["pain-generic.png","痛点 02 · 练法错位","通用课学了用不上，跟读多、对话少","市面课程多为通用内容，缺少行业/岗位定制，学完对不上你的会话语境。再加上听力跟读占大头，真正对话很少——单词刷得熟，一到真人对话就卡壳。"],["pain-measure.png","痛点 03 · 效果模糊","进步难量化，越学越容易迷失","练了很多，却说不清自己强在哪、弱在哪；没有清晰能力画像和变化轨迹，坚持靠感觉，方向感越来越差。"]].map(x=><article className="pain-card" key={x[1]}><div className="pain-media"><img src={`${A}${x[0]}`} alt={x[2]} /></div><div className="pain-body"><span className="tag">{x[1]}</span><h4>{x[2]}</h4><p>{x[3]}</p></div></article>)}
+        {[["pain-meeting.png","痛点 01 · 场景失语","读写尚可，关键场合不敢说","邮件、文档还能应付；一到英文会议、客户对接、现场汇报，脑子里有词却组织不起来，怕说错、怕被追问，只好沉默或切回中文。"],["pain-generic.png","痛点 02 · 练法错位","通用课学了用不上，跟读多、对话少","市面课程多为通用内容，缺少行业/岗位定制，学完对不上你的会话语境。再加上听力跟读占大头，真正对话很少——单词刷得熟，一到真人对话就卡壳。"],["pain-measure.png","痛点 03 · 效果模糊","进步难量化，越学越容易迷失","练了很多，却说不清自己强在哪、弱在哪；没有清晰能力画像和变化轨迹，坚持靠感觉，方向感越来越差。"]].map(x=><article className="pain-card" key={x[1]}><div className="pain-media"><img src={`${A}${x[0]}`} alt={x[2]} /></div><div className="pain-body"><h4>{x[2]}</h4><p>{x[3]}</p></div></article>)}
       </div></div></section>
 
       <section className="section section--soft" id="how"><div className="wrap"><div className="section-head"><h2>咕噜是如何帮你开口的</h2><p className="muted">从你会用到的场景出发，把学习内容、对话练习和个性化反馈串成一条线，以口语输出为核心，过程中自然而然全方位锻炼听说读写</p></div><div className="how-flow"><div className="how-step-nav">{steps.map((s,i)=><button key={s.title} className={`step ${step===i?"is-active":""}`} onClick={()=>setStep(i)}><span className="step-num">{i+1}</span><h4>{s.title}</h4><p>{s.short}</p></button>)}</div><div className="box how-panel grid grid-2 panel-fade" key={step}><div><h3>{steps[step].heading}</h3><p>{steps[step].body}</p><ul>{steps[step].points.map(p=><li key={p}>{p}</li>)}</ul></div><div className="shot shot--wide"><img src={`${A}${steps[step].image}`} alt={steps[step].title} /></div></div></div></div></section>
@@ -294,7 +179,7 @@ export default function Home() {
 
       <section className="section section--soft" id="scenes"><div className="wrap"><div className="section-head"><h2>核心场景全覆盖，即学即用</h2><p className="muted">咕噜口语依托海量大数据与真实职场语料库，精心研发数万节 AI 情景课程，全面覆盖生活、工作的实际语言需求。</p></div><div className="scene-gallery">{scenes.map((s,i)=><button className="scene-card" key={s[1]} onClick={()=>{setScene(i);setIntent(0);setModal("scene")}}><img src={`${A}${s[0]}`} alt={`${s[1]}场景`} /><span className="scene-card-hover"><b className="scene-card-cta">内容预览</b></span><span className="scene-card-cap"><strong>{s[1]}</strong><em>{s[2]}</em></span></button>)}</div></div></section>
 
-      <section className="section" id="biz-teaser"><div className="wrap"><div className="box grid grid-2 biz-box"><div><span className="tag tag-green">咕噜口语企业版</span><h2>给团队的口语训练管理系统</h2><p>把「练口语」变成可布置、可追踪、可汇报的组织能力。帮企业省心省力解决英语口语难题。</p><ul><li>组织与席位管理，离职可回收再分配</li><li>任务下发、打卡规则与完成率追踪</li><li>学习数据看板，效果清晰可汇报</li></ul><a className="btn btn-primary" href={`${BASE}/business`}>了解企业版 →</a></div><a className="shot shot--wide" href={`${BASE}/business`}><img src={`${A}business-hero.png`} alt="企业管理后台数据概览" /></a></div></div></section>
+      <section className="section" id="biz-teaser"><div className="wrap"><div className="box grid grid-2 biz-box"><div><h2>给团队的口语训练管理系统</h2><p>把「练口语」变成可布置、可追踪、可汇报的组织能力。帮企业省心省力解决英语口语难题。</p><ul><li>组织与席位管理，离职可回收再分配</li><li>任务下发、打卡规则与完成率追踪</li><li>学习数据看板，效果清晰可汇报</li></ul><a className="btn btn-primary" href={`${BASE}/business`}>了解企业版 →</a></div><a className="shot shot--wide" href={`${BASE}/business`}><img src={`${A}business-hero.png`} alt="企业管理后台数据概览" /></a></div></div></section>
 
       <section className="section section--soft reviews"><div className="wrap"><div className="section-head"><h2>用户真实评价</h2><p className="muted">来自上千万用户的 App Store 真实反馈。</p></div></div><div className="review-walls">{[reviews,reviews.slice().reverse()].map((row,j)=><div className={`review-wall review-wall--${j?"b":"a"}`} key={j}><div className="review-wall-track">{[...row,...row].map((r,i)=><article className="review-card" key={`${j}-${i}`}><strong>{r[0]}</strong><span className="review-stars">★★★★★</span><span className="review-meta">{r[1]}</span><p>{r[2]}</p></article>)}</div></div>)}</div></section>
 
@@ -302,10 +187,10 @@ export default function Home() {
 
       <section className="section center" id="final-cta"><div className="wrap"><h2>自信开口，即刻开始</h2><p className="muted">仅需5分钟，在咕噜口语完成你的第一段AI英语对话。</p><div className="cta-row"><button className="btn btn-primary btn-lg" onClick={()=>setModal("download")}>免费下载APP</button><a className="btn btn-lg" href={`${BASE}/business`}>了解企业版</a></div></div></section>
 
-      <footer className="site-footer"><div className="wrap"><div className="foot-grid"><div className="foot-brand"><h4>咕噜口语</h4><p className="small">你的场景化 AI 英语口语教练<br/>帮中国人真正开口说英语</p></div><div><h4>产品</h4><div className="stack"><a href="#how">如何开口</a><a href="#capabilities">核心功能</a><a href="#scenes">练习场景</a></div></div><div><h4>服务</h4><div className="stack"><a href={`${BASE}/business`}>企业版</a><a href="#faq">常见问题</a></div></div><div><h4>法律</h4><div className="stack"><a href="#">用户协议</a><a href="#">隐私政策</a></div></div></div><div className="foot-meta"><div>© 2026 北京火山创想科技有限公司</div><div className="foot-meta-beian">京ICP备2023009050号-4</div></div></div></footer>
+      <SiteFooter home />
 
       <AnimatedModal open={modal !== null} onClose={() => setModal(null)} className={modal === "download" ? "modal--download" : modal === "award" ? "modal--award" : modal === "scene" ? "modal--scene" : ""}>
-        {modal === "download" && <div className="download-modal"><div className="modal-title"><h3>下载 APP</h3><p>支持 iOS / Android，扫码或选择应用商店下载。</p></div><div className="download-grid"><article className="download-platform"><div className="download-platform-head"><span><AppleFilled/></span><div><b>iOS</b><small>App Store</small></div></div><img className="download-qr" src={`${A}ios.png`} alt="iOS 下载二维码"/><Button className="download-store-link download-store-link--android" size="large" icon={<AppleFilled/>} href="https://apps.apple.com/cn/app/%E5%92%95%E5%99%9C%E5%8F%A3%E8%AF%AD-ai%E5%A4%96%E6%95%991%E5%AF%B91%E7%BB%83%E5%8F%A3%E8%AF%AD/id6462875096" target="_blank" rel="noopener noreferrer">App Store 下载</Button></article><article className="download-platform"><div className="download-platform-head"><span><AndroidFilled/></span><div><b>Android</b><small>应用宝</small></div></div><img className="download-qr" src={`${A}android.png`} alt="Android 下载二维码"/><Button className="download-store-link download-store-link--android" size="large" icon={<AndroidFilled/>} href="https://sj.qq.com/appdetail/com.huoideas.speakguru" target="_blank" rel="noopener noreferrer">Android 下载</Button></article></div><p className="download-tip">使用手机扫码，或点击对应按钮前往应用商店</p></div>}
+        {modal === "download" && <AppDownloadContent />}
         {modal === "award" && <><div className="modal-title"><h3>{awards[award].title}</h3><p>{awards[award].issuer} · {awards[award].desc}</p></div><div className="award-full"><img src={`${A}${awards[award].full}`} alt={awards[award].title}/></div></>}
         {modal === "scene" && <div className="scene-modal"><div className="scene-modal-nav"><h3>{sceneCat.name}</h3><span className="scene-modal-label">选择具体场合</span><div className="scene-modal-intents">{sceneCat.intents.map((x, i) => <button key={x.label} className={i === intent ? "is-active" : ""} onClick={() => setIntent(i)}>{x.label}</button>)}</div><button className="btn btn-primary scene-modal-cta" onClick={() => setModal("download")}>下载 APP 练这个场景</button></div><div className="scene-modal-preview"><div className="phone-device--scene"><div className="phone-screen"><div className="phone-app"><div className="iphone-status"><span className="iphone-time">{clock}</span><span className="iphone-island"/><span className="iphone-icons"><svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor" aria-hidden="true"><rect x="0" y="7" width="3" height="4" rx="0.8"/><rect x="4.5" y="5" width="3" height="6" rx="0.8"/><rect x="9" y="2.5" width="3" height="8.5" rx="0.8"/><rect x="13.5" y="0" width="3" height="11" rx="0.8"/></svg><svg width="16" height="11" viewBox="0 0 16 11" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true"><path d="M1.5 4a10 10 0 0 1 13 0"/><path d="M4 6.8a 6.5 6.5 0 0 1 8 0"/><path d="M6.6 9.4a3 3 0 0 1 2.8 0"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" aria-hidden="true"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="15" height="8" rx="2" fill="currentColor"/><path d="M23 4v4a2.2 2.2 0 0 0 0-4Z" fill="currentColor" opacity=".4"/></svg></span></div><div className="phone-app-body panel-fade" key={scene * 10 + intent}><div className="phone-lesson-head"><strong>{sceneIt.title}</strong><span>{sceneIt.fear}</span></div><div className="phone-bubble"><span className="phone-bubble-label">对方开场</span><div className="phone-bubble-row"><img className="phone-avatar" src={sceneAvatars[avatar]} alt="AI 外教"/><p>{sceneIt.ai}</p></div></div><div className="phone-card"><span className="phone-card-title">对话目标</span><ol className="phone-goals">{sceneIt.goals.map((g, i) => <li key={g}><span className="goal-num">{i + 1}</span>{g}</li>)}</ol></div><div className="phone-card"><span className="phone-card-title">核心例句</span><div className="phone-sents">{sceneIt.sentences.map((s) => <span key={s}>{s}</span>)}</div></div><div className="phone-card"><span className="phone-card-title">关键词汇</span><div className="phone-vocab">{sceneIt.vocab.map((v) => <span key={v}>{v}</span>)}</div></div></div><div className="phone-home"/></div></div></div></div></div>}
       </AnimatedModal>
