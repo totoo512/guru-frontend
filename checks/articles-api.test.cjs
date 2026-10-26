@@ -24,7 +24,7 @@ function respond(data, code = "SUCCESS") { return new Response(JSON.stringify({ 
 
 test("fetches only the requested page, uses total and sanitizes upstream HTML", async () => {
   global.fetch = async (url, options) => {
-    assert.match(url, /\/public\/seo\/articles\?pageNum=2&pageSize=9$/);
+    assert.equal(url, "https://test-enginev2.huoideas.com/api/v1/public/seo/articles?pageNum=2&pageSize=9");
     assert.equal(options.cache, "no-store");
     assert.ok(options.signal);
     return respond({ total: 123, list: [fixture] });

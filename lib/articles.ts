@@ -4,7 +4,7 @@ import { articleHtml, plainText } from "./article-html";
 export const ARTICLES_PER_PAGE = 9;
 export const SITEMAP_PAGE_SIZE = 100;
 export const articleListPath = (page: number) => page === 1 ? "/news" : `/news/page/${page}`;
-const DEFAULT_ARTICLE_API = "http://127.0.0.1:5566/api/v1/public/seo/articles";
+const DEFAULT_ARTICLE_API = "https://test-enginev2.huoideas.com/api/v1/public/seo/articles";
 
 export interface Article {
   slug: string;
