@@ -2,10 +2,18 @@
 
 ## 唯一数据源
 
-- 分页：`GET https://admin.huoideas.com/api/seo/article/page?pageNum=1&pageSize=9`
-- 详情：`GET https://admin.huoideas.com/api/seo/article/one?articleId=14027`
+数据源为 `speakguru-engine-v2--backend` 的公开文章接口，读取该后端 `spring.datasource` 数据库中的 `app_seo_article` 表：
 
-文章在 admin.huoideas.com 对应后台维护，官网只读展示。具体编辑菜单和写入接口由该管理端负责。本项目不提供文章写入接口或后台登录，也不存储本地文章副本。
+- 分页：`GET /api/v1/public/seo/articles?pageNum=1&pageSize=9`
+- 详情：`GET /api/v1/public/seo/articles/14027`
+- 响应业务状态为 `code: "SUCCESS"`；列表包含 `data.list` 和 `data.total`，按 ID 倒序。
+
+Next.js 服务端通过 `ARTICLE_API_BASE_URL` 指定以上接口的根地址，默认值为
+`http://127.0.0.1:5566/api/v1/public/seo/articles`。生产环境跨机器部署时，应在 Node 进程启动环境中填入实际后端内网或 HTTPS 地址。
+该变量不带 `NEXT_PUBLIC_` 前缀，仅在服务端使用；修改后重启进程生效，无需重建。
+
+文章由迁移后的后端自动或手动生成入库；历史文章如需继续展示，需导入该表并保留原 ID。
+文章读取接口无需登录，生成入口仍要求管理员身份。本前端不提供写入接口或后台登录，也不存储本地文章副本。
 
 列表显示接口返回的总篇数，并按接口分页。详情使用单篇接口，不依赖文章处于列表的哪一页。网址继续保留 `/news/14027`，列表分页为 `/news/page/2`。
 
@@ -15,7 +23,7 @@
 
 后台正文沿用 HTML，进入页面前会去掉脚本、事件属性、iframe 和全局样式，直接输出主页面正文，供用户和爬虫阅读。标题、摘要、日期和结构化数据均来自对应文章。接口没有提供的日期不会伪造成当前日期。
 
-详情接口明确返回 data: null 时展示 404；接口超时、HTTP 错误、业务失败或格式异常作为加载失败处理，避免将临时故障当作文章删除。辅助的推荐文章加载失败不会影响已取得的文章正文。
+详情接口返回 HTTP 404 或 data: null 时展示 404；接口超时、HTTP 错误、业务失败或格式异常作为加载失败处理，避免将临时故障当作文章删除。辅助的推荐文章加载失败不会影响已取得的文章正文。
 
 ## SEO
 
@@ -42,7 +50,7 @@ npm run build
 流水线收集 `dist/` 的全部内容（必须包括隐藏目录 `.next/`），部署后在发布目录启动：
 
 ```bash
-HOSTNAME=127.0.0.1 PORT=3000 NODE_ENV=production node server.js
+ARTICLE_API_BASE_URL=http://127.0.0.1:5566/api/v1/public/seo/articles HOSTNAME=127.0.0.1 PORT=3000 NODE_ENV=production node server.js
 ```
 
 dist/ 包含必要依赖、public 资源和浏览器静态资源；服务器无需再次 npm install。不要仅复制普通 .next 目录，也不再部署旧 out/。服务器与构建环境需保持操作系统/架构兼容，Node.js 主版本一致。
@@ -61,7 +69,7 @@ location / {
 }
 ```
 
-文章页面不要额外配置 Nginx/CDN 的长期 HTML 缓存，否则更新仍会延迟。服务器需能通过 HTTPS 访问 admin.huoideas.com；接口请求由服务端完成，不受浏览器跨域限制。
+文章页面不要额外配置 Nginx/CDN 的长期 HTML 缓存，否则更新仍会延迟。官网服务器需能访问 `ARTICLE_API_BASE_URL` 对应的新后端；接口请求由服务端完成，不受浏览器跨域限制。
 
 `.github/workflows/deploy.yml` 已改成构建验证，不再上传 out/ 或部署 GitHub Pages。真实服务器发布需接入该服务器的现有部署流程。
 

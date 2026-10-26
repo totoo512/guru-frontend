@@ -4,7 +4,7 @@ import { articleHtml, plainText } from "./article-html";
 export const ARTICLES_PER_PAGE = 9;
 export const SITEMAP_PAGE_SIZE = 100;
 export const articleListPath = (page: number) => page === 1 ? "/news" : `/news/page/${page}`;
-const API = "https://admin.huoideas.com/api/seo/article";
+const DEFAULT_ARTICLE_API = "http://127.0.0.1:5566/api/v1/public/seo/articles";
 
 export interface Article {
   slug: string;
@@ -47,22 +47,24 @@ function normalizeArticle(value: unknown): Article {
   };
 }
 
-async function requestArticleApi(path: string, cacheSeconds: number): Promise<unknown> {
-  const response = await fetch(`${API}${path}`, {
+async function requestArticleApi(path: string, cacheSeconds: number, allowNotFound = false): Promise<unknown> {
+  const api = (process.env.ARTICLE_API_BASE_URL || DEFAULT_ARTICLE_API).replace(/\/+$/, "");
+  const response = await fetch(`${api}${path}`, {
     ...(cacheSeconds > 0 ? { next: { revalidate: cacheSeconds } } : { cache: "no-store" as const }),
     signal: AbortSignal.timeout(15000),
     headers: { Accept: "application/json" },
   });
+  if (allowNotFound && response.status === 404) return null;
   if (!response.ok) throw new Error(`文章服务请求失败：HTTP ${response.status}`);
   const result = await response.json();
-  if (!result || result.code !== 0) throw new Error("文章服务返回失败状态");
+  if (!result || result.code !== "SUCCESS") throw new Error("文章服务返回失败状态");
   return result.data;
 }
 
 // React cache only deduplicates within a render; visitor requests always fetch fresh content.
 export const getArticlePage = cache(async (page = 1, pageSize = ARTICLES_PER_PAGE, cacheSeconds = 0): Promise<ArticlePage> => {
   if (!Number.isSafeInteger(page) || page < 1 || !Number.isSafeInteger(pageSize) || pageSize < 1) throw new Error("文章分页参数无效");
-  const value = await requestArticleApi(`/page?pageNum=${page}&pageSize=${pageSize}`, cacheSeconds);
+  const value = await requestArticleApi(`?pageNum=${page}&pageSize=${pageSize}`, cacheSeconds);
   if (!value || typeof value !== "object") throw new Error("文章列表接口格式异常");
   const data = value as Record<string, unknown>;
   const total = data.total;
@@ -72,7 +74,7 @@ export const getArticlePage = cache(async (page = 1, pageSize = ARTICLES_PER_PAG
 
 export const getArticle = cache(async (id: string): Promise<Article | undefined> => {
   if (!/^[1-9]\d*$/.test(id)) return undefined;
-  const value = await requestArticleApi(`/one?articleId=${encodeURIComponent(id)}`, 0);
+  const value = await requestArticleApi(`/${encodeURIComponent(id)}`, 0, true);
   if (value == null) return undefined;
   const article = normalizeArticle(value);
   if (article.slug !== id) throw new Error("文章详情接口返回的 ID 不匹配");

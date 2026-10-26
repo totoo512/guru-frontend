@@ -41,6 +41,14 @@ Nginx 代理到 `127.0.0.1:3000`，进程守护交给现有 systemd/PM2 服务�
 
 ## 资讯与文章
 
-文章由 Next.js 服务端实时读取 `https://admin.huoideas.com/api/seo/article` 接口；不读取本地 Markdown / HTML 文件，也不依赖浏览器缓存。后台新增、更新文章后，下次请求即可显示，无需重新构建官网。
+文章由 Next.js 服务端实时读取 `speakguru-engine-v2--backend` 的公开文章接口；不读取本地 Markdown / HTML 文件，也不依赖浏览器缓存。后台新增、更新文章后，下次请求即可显示，无需重新构建官网。
+
+启动时配置 `ARTICLE_API_BASE_URL` 为新后端文章接口根地址，默认 `http://127.0.0.1:5566/api/v1/public/seo/articles`（同服务器部署）。跨服务器时改为实际内网或 HTTPS 地址：
+
+```bash
+ARTICLE_API_BASE_URL=https://你的后端域名/api/v1/public/seo/articles HOSTNAME=127.0.0.1 PORT=8000 NODE_ENV=production node server.js
+```
+
+此变量仅供服务端读取，可在运行时修改后重启进程，无需重新构建。后端需先部署公开读取接口；文章使用其 `spring.datasource` 数据库中的 `app_seo_article` 表。
 
 完整接口、SEO、异常处理及部署说明见 [文章维护指南](docs/articles.md)。

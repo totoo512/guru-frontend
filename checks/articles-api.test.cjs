@@ -20,11 +20,11 @@ const { getArticlePage, getArticle } = loadUtility("articles");
 const originalFetch = global.fetch;
 afterEach(() => { global.fetch = originalFetch; });
 const fixture = { id: 42, title: "真实标题", content: '<html><head><style>bad</style></head><body><p>正文</p><script>bad()</script></body></html>', createTime: "2026-10-21 09:30:00", updateTime: null };
-function respond(data, code = 0) { return new Response(JSON.stringify({ code, data }), { headers: { "Content-Type": "application/json" } }); }
+function respond(data, code = "SUCCESS") { return new Response(JSON.stringify({ code, data }), { headers: { "Content-Type": "application/json" } }); }
 
 test("fetches only the requested page, uses total and sanitizes upstream HTML", async () => {
   global.fetch = async (url, options) => {
-    assert.match(url, /page\?pageNum=2&pageSize=9$/);
+    assert.match(url, /\/public\/seo\/articles\?pageNum=2&pageSize=9$/);
     assert.equal(options.cache, "no-store");
     assert.ok(options.signal);
     return respond({ total: 123, list: [fixture] });
@@ -43,6 +43,9 @@ test("repeated requests read updated backend content", async () => {
 test("distinguishes missing articles from upstream failures", async () => {
   global.fetch = async () => respond(null);
   assert.equal(await getArticle("42"), undefined);
+  global.fetch = async () => new Response("not found", { status: 404 });
+  assert.equal(await getArticle("42"), undefined);
+  await assert.rejects(getArticlePage(), /HTTP 404/);
   global.fetch = async () => new Response("unavailable", { status: 503 });
   await assert.rejects(getArticle("42"), /HTTP 503/);
   global.fetch = async () => respond(null, 500);
@@ -63,4 +66,19 @@ test("keeps sitemap caching separate and rejects malformed lists", async () => {
   global.fetch = async () => respond({ total: 1, list: null });
   await assert.rejects(getArticlePage(), /格式异常/);
   await assert.rejects(getArticlePage(-1), /分页参数无效/);
+});
+
+test("reads configured backend base URL at runtime and removes trailing slash", async () => {
+  const previous = process.env.ARTICLE_API_BASE_URL;
+  process.env.ARTICLE_API_BASE_URL = "http://backend.test/api/v1/public/seo/articles/";
+  try {
+    global.fetch = async (url) => {
+      assert.equal(url, "http://backend.test/api/v1/public/seo/articles/42");
+      return respond(fixture);
+    };
+    assert.equal((await getArticle("42")).slug, "42");
+  } finally {
+    if (previous === undefined) delete process.env.ARTICLE_API_BASE_URL;
+    else process.env.ARTICLE_API_BASE_URL = previous;
+  }
 });
