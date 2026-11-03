@@ -36,7 +36,8 @@ function normalizeArticle(value: unknown): Article {
   if (!/^[1-9]\d*$/.test(slug) || !title || typeof data.content !== "string") throw new Error("文章接口缺少 ID、标题或正文");
   const html = articleHtml(data.content);
   const text = plainText(html);
-  const publishedAt = dateValue(data.createTime);
+  const publishedAt = typeof data.publishAt === "number" && Number.isSafeInteger(data.publishAt) && data.publishAt > 0 && data.publishAt <= 253402271999999
+    ? new Date(data.publishAt).toISOString() : dateValue(data.createTime);
   return {
     slug, title, html, publishedAt,
     updatedAt: dateValue(data.updateTime) || publishedAt,

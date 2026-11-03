@@ -82,3 +82,9 @@ test("reads configured backend base URL at runtime and removes trailing slash", 
     else process.env.ARTICLE_API_BASE_URL = previous;
   }
 });
+
+
+test("scheduled articles use publication time rather than import time", async () => {
+  global.fetch = async () => respond({ ...fixture, publishAt: Date.UTC(2026, 10, 2, 4, 30, 0) });
+  assert.equal((await getArticle("42")).publishedAt, "2026-11-02T04:30:00.000Z");
+});

@@ -72,3 +72,7 @@ location / {
 `.github/workflows/deploy.yml` 已改成构建验证，不再上传 out/ 或部署 GitHub Pages。真实服务器发布需接入该服务器的现有部署流程。
 
 验证：`npm run test:article-api`、`npm run build`；运行生产服务后访问 `/news`、`/news/page/2`、`/news/14027` 和 `/sitemap.xml`。
+
+## 定时发布
+
+后台可设置北京时间的未来发布时间。后端使用 `publish_at`（Unix 毫秒）控制公开列表、总数和详情的可见性，未到期详情返回 404，到期后自动可读。官网优先用接口的 `publishAt` 显示发布日期，历史文章仍使用 `createTime`。部署新版后端前需执行 V21 数据库迁移；当前后端 Flyway 自动执行关闭。站点地图沿用最多 5 分钟的缓存刷新周期。
