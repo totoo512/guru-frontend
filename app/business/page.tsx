@@ -66,6 +66,7 @@ const customers: Array<{ name: string; logo?: string }> = [
   { name: "山东农业大学" },
   { name: "河北农业大学" },
   { name: "海南师范大学" },
+  { name: "澳门科技大学" },
 ];
 
 const adminFeatures = [
