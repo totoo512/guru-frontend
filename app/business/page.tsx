@@ -40,7 +40,7 @@ type Mode = "light" | "dark";
 type ContactType = "trial" | "consult" | null;
 type ViewTransitionDoc = Document & { startViewTransition?: (cb: () => void) => { ready: Promise<void> } };
 
-const customers: Array<{ name: string; logo?: string }> = [
+const customers: Array<{ name: string; logo: string }> = [
   { name: "宁德时代", logo: "https://cdn.oral-craft.com/web/_next/static/media/宁德时代.a547f16f.png" },
   { name: "三星", logo: "https://cdn.oral-craft.com/web/_next/static/media/三星.46d9df6f.jpeg" },
   { name: "惠普", logo: "https://cdn.oral-craft.com/web/_next/static/media/惠普.20a14e3a.jpeg" },
@@ -61,12 +61,12 @@ const customers: Array<{ name: string; logo?: string }> = [
   { name: "中圣集团", logo: "https://cdn.oral-craft.com/web/_next/static/media/中圣集团.347eda55.jpg" },
   { name: "三峰环境", logo: "https://cdn.oral-craft.com/web/_next/static/media/三峰环境.0566503b.jpg" },
   { name: "三峰卡万塔", logo: "https://cdn.oral-craft.com/web/_next/static/media/三峰卡万塔.d823f3aa.jpg" },
-  { name: "鉴衡认证" },
-  { name: "亨利式" },
-  { name: "山东农业大学" },
-  { name: "河北农业大学" },
-  { name: "海南师范大学" },
-  { name: "澳门科技大学" },
+  { name: "鉴衡认证", logo: `${A}partners/cgc.png` },
+  { name: "亨利式", logo: `${A}partners/henry.jpg` },
+  { name: "山东农业大学", logo: `${A}partners/sdau.png` },
+  { name: "河北农业大学", logo: `${A}partners/hebau.jpeg` },
+  { name: "海南师范大学", logo: `${A}partners/hainnu.jpeg` },
+  { name: "澳门科技大学", logo: `${A}partners/must-emblem.png` },
 ];
 
 const adminFeatures = [
@@ -269,7 +269,7 @@ export default function BusinessPage() {
                     {[...row, ...row].map((customer, index) => (
                       <figure className={styles.logoChip} key={`${rowIndex}-${customer.name}-${index}`} aria-hidden={index >= row.length}>
                         <span className={styles.logoChipMedia}>
-                          {customer.logo ? <img src={customer.logo} alt={customer.name} /> : <b>{customer.name}</b>}
+                          <img src={customer.logo} alt={customer.name} />
                         </span>
                         <figcaption>{customer.name}</figcaption>
                       </figure>
