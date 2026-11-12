@@ -10,7 +10,6 @@ export default function SiteFooter({ home = false }: { home?: boolean }) {
         <div><h4>服务</h4><div className="stack"><a href={`${BASE}/business`}>企业版</a><a href={`${BASE}/news`}>资讯</a><a href={homeLink("faq")}>常见问题</a></div></div>
         <div><h4>法律</h4><div className="stack"><a href="#">用户协议</a><a href="#">隐私政策</a></div></div>
       </div>
-      <div className="foot-meta"><div>© 2026 北京火山创想科技有限公司</div><div className="foot-meta-beian">京ICP备2023009050号-4</div></div>
     </div>
   </footer>;
 }
