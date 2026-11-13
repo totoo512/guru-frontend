@@ -199,6 +199,7 @@ export default function BusinessPage() {
               <a href="#outcomes">学习效果</a>
               <a href="#service">服务流程</a>
               <Link href="/news">资讯</Link>
+              <Link href="/about">公司介绍</Link>
               <a href="#faq">FAQ</a>
             </nav>
             <div className="nav-actions nav-actions--bar">
@@ -222,6 +223,7 @@ export default function BusinessPage() {
             <a href="#outcomes" onClick={closeMenu}>学习效果</a>
             <a href="#service" onClick={closeMenu}>服务流程</a>
             <Link href="/news" onClick={closeMenu}>资讯</Link>
+            <Link href="/about" onClick={closeMenu}>公司介绍</Link>
             <a href="#faq" onClick={closeMenu}>FAQ</a>
             <Link href="/">返回个人版</Link>
             <button onClick={() => { closeMenu(); setContact("trial"); }}>免费开通试用</button>

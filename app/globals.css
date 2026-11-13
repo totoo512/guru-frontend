@@ -583,3 +583,4 @@
 @media(prefers-reduced-motion:reduce){.hero-brand,.hero-title-accent,.hero-copy,.guru-visual-card,.guru-orbit,.guru-bubble{animation:none}}
 
 .site-header .nav-links a[aria-current="page"]{background:var(--brand-light);color:var(--brand-dark)}
+@media(min-width:901px) and (max-width:1100px){.nav-inner{gap:14px}.nav-links{gap:0}.nav-links a{padding-inline:9px}.site-header .logo>span{display:none}}

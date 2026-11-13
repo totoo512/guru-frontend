@@ -1,0 +1,25 @@
+.hero{padding:96px 0;background:radial-gradient(ellipse at 85% 25%,rgba(var(--brand-rgb),.12),transparent 55%),var(--bg-soft)}
+.heroGrid{display:grid;grid-template-columns:1.3fr 1fr;gap:80px;align-items:center}
+.eyebrow{margin:0 0 20px!important;color:var(--brand-dark)!important;font-size:13px;font-weight:600;letter-spacing:.08em}
+.hero h1{margin:0;font-size:clamp(36px,4.6vw,60px);line-height:1.25;letter-spacing:-.04em}
+.hero h1 span{color:var(--brand-dark)}
+.intro{max-width:560px;margin:24px 0 30px;font-size:17px;line-height:1.9}
+.brandCard{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:340px;padding:40px 24px;border:1px solid var(--line);border-radius:32px;background:var(--surface);box-shadow:var(--sh-lg);text-align:center}
+.brandCard img{border-radius:24px;margin-bottom:24px}
+.brandCard strong{font-size:28px;line-height:1.4}
+.brandCard strong span{display:block;font-size:18px;color:var(--brand-dark);margin-top:4px}
+.brandCard p{margin:16px 0 24px}
+.tags{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.tags span{padding:6px 12px;border-radius:var(--r-pill);background:var(--bg-soft);color:var(--text-2);font-size:12px}
+.story{display:grid;grid-template-columns:1fr 1.6fr;gap:80px}
+.prose p{margin:0 0 20px;font-size:16px;line-height:1.95}
+.prose p:last-child{margin-bottom:0}
+.values{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.value{padding:32px;border:1px solid var(--line);border-radius:24px;background:var(--surface)}
+.value>span{display:block;margin-bottom:26px;color:var(--brand-dark);font-size:14px;font-weight:600}
+.value p{margin:16px 0 0;line-height:1.85;font-size:15px}
+.contact{display:flex;align-items:center;justify-content:space-between;gap:40px;padding:44px;border:1px solid var(--line);border-radius:28px;background:var(--bg-soft)}
+.contact h2{font-size:clamp(26px,3vw,36px)}
+.contact p:last-child{margin:16px 0 0;max-width:660px;line-height:1.8}
+@media(max-width:900px){.hero{padding:64px 0}.heroGrid{gap:36px}.story{gap:32px}.values{grid-template-columns:1fr}.value{padding:26px}.value>span{margin-bottom:16px}.contact{flex-direction:column;align-items:flex-start;padding:30px}}
+@media(max-width:600px){.heroGrid,.story{grid-template-columns:1fr}.hero{padding:48px 0}.hero h1{font-size:36px}.intro{font-size:16px}.brandCard{min-height:290px}.story h2 br{display:none}.contact{padding:24px}}

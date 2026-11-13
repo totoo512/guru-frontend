@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Popover } from "antd";
 import { MoonOutlined, SunOutlined } from "@ant-design/icons";
 import { ASSETS as A, BASE } from "@/lib/paths";
@@ -12,6 +13,7 @@ export default function SiteHeader({ theme, onDownload, home = false }: {
   home?: boolean;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
   const { mode, changeMode, themePanel } = theme;
   const homeLink = (section: string) => home ? `#${section}` : `${BASE}/#${section}`;
   useEffect(() => {
@@ -53,7 +55,7 @@ export default function SiteHeader({ theme, onDownload, home = false }: {
           <nav id="site-navigation" aria-label="主导航" className={`nav-panel ${menuOpen ? "is-open" : ""}`}>
             <ul className="nav-links" onClick={() => setMenuOpen(false)}>
               <li className="dropdown"><a href={homeLink("top")} className="nav-link-dd">产品 <i className="nav-chevron" /></a><div className="dropdown-menu"><a href={homeLink("how")} className="dd-item"><span className="dd-ico">✦</span><span className="dd-text"><b>核心产品</b><small>场景学习 · AI 对话</small></span></a></div></li>
-              <li><a href={homeLink("how")}>如何开口</a></li><li><a href={homeLink("capabilities")}>核心功能</a></li><li><a href={homeLink("scenes")}>场景</a></li><li><a href={`${BASE}/news`} aria-current={!home ? "page" : undefined}>资讯</a></li><li><a href={homeLink("faq")}>FAQ</a></li>
+              <li><a href={homeLink("how")}>如何开口</a></li><li><a href={homeLink("capabilities")}>核心功能</a></li><li><a href={homeLink("scenes")}>场景</a></li><li><a href={`${BASE}/news`} aria-current={/^\/news(?:\/|$)/.test(pathname) ? "page" : undefined}>资讯</a></li><li><a href={`${BASE}/about`} aria-current={pathname === "/about" ? "page" : undefined}>公司介绍</a></li><li><a href={homeLink("faq")}>FAQ</a></li>
             </ul>
             <div className="nav-actions nav-actions--panel"><button className="btn" onClick={() => { setMenuOpen(false); onDownload(); }}>免费下载APP</button></div>
           </nav>
